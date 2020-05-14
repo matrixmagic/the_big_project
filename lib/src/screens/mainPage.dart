@@ -10,20 +10,18 @@ class mainPage extends StatefulWidget {
 
 class _mainPageState extends State<mainPage>
     with SingleTickerProviderStateMixin {
-  Animation<Color> animation;
+  Animation<double> animation;
   AnimationController controller;
+  GlobalKey<ScaffoldState> _drawerKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
     controller = new AnimationController(
       vsync: this,
-      duration: Duration(seconds: 1),
+      duration: Duration(seconds: 9),
     );
-    animation = Tween<Color>(begin: Colors.white, end: Colors.blueAccent)
-        .animate(controller);
-    FutureBuilder(builder: ,)
-
+    animation = Tween<double>(begin: 3.14 / 2, end: 0.0).animate(controller);
   }
 
   List<Icon> navbaricons = [
@@ -34,20 +32,25 @@ class _mainPageState extends State<mainPage>
   ];
 
   List<String> leftNav = ["Home", "help", "feedback", "invite friend"];
-  GlobalKey _drawerkey = GlobalKey();
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  GlobalKey<ScaffoldState> _drawerKey = GlobalKey();
-  bool multi = true;
 
+  bool multi = true;
 
   @override
   Widget build(BuildContext context) {
-
     return SafeArea(
         child: Scaffold(
             key: _drawerKey,
             backgroundColor: Color(0xFFFEFEFE),
             appBar: AppBar(
+              leading: IconButton(
+                  icon: Icon(Icons.menu),
+                  onPressed: () {
+                    _drawerKey.currentState.openDrawer();
+                    if (_drawerKey.currentState.isDrawerOpen) {
+                      print('drawer is opennnnnnn');
+                      controller.forward();
+                    }
+                  }),
               iconTheme: IconThemeData(color: Colors.black),
               backgroundColor: Colors.white,
               actions: <Widget>[
@@ -80,10 +83,19 @@ class _mainPageState extends State<mainPage>
                         margin: EdgeInsets.only(right: 90.0, top: 14.0),
                         width: 120.0,
                         height: 120.0,
-                        child: ClipRRect(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(60.0)),
-                          child: Image.asset('assets/images/userimg.jpg'),
+                        child: AnimatedBuilder(
+                          animation: controller,
+                          builder: (context, child) {
+                            return Transform.rotate(
+                              angle: animation.value,
+                              child: child,
+                            );
+                          },
+                          child: ClipRRect(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(60.0)),
+                            child: Image.asset('assets/images/userimg.jpg'),
+                          ),
                         ),
                       ),
                       Padding(
@@ -126,21 +138,15 @@ class _mainPageState extends State<mainPage>
                     child: ListView.builder(
                       itemCount: leftNav.length,
                       itemBuilder: (BuildContext context, int index) {
-                        return AnimatedBuilder(
-                          animation: controller,
-                          builder: (BuildContext context, Widget child) {
-                            return Container(
-                              margin: EdgeInsets.only(right: 50.0),
-                              decoration: BoxDecoration(
-                                  color: widget.selected_index == index
-                                      ? Colors.blueAccent.withOpacity(0.3)
-                                      : Colors.white,
-                                  borderRadius: BorderRadius.only(
-                                      bottomRight: Radius.circular(40.0),
-                                      topRight: Radius.circular((40)))),
-                              child: child,
-                            );
-                          },
+                        return Container(
+                          margin: EdgeInsets.only(right: 50.0),
+                          decoration: BoxDecoration(
+                              color: widget.selected_index == index
+                                  ? Colors.blueAccent.withOpacity(0.3)
+                                  : Colors.white,
+                              borderRadius: BorderRadius.only(
+                                  bottomRight: Radius.circular(40.0),
+                                  topRight: Radius.circular((40)))),
                           child: ListTile(
                             title: Text(leftNav[index]),
                             leading: Icon(navbaricons[index].icon,
@@ -151,6 +157,8 @@ class _mainPageState extends State<mainPage>
                               setState(() {
                                 widget.selected_index = index;
                               });
+                              controller.reverse();
+                              Navigator.pop(context);
                             },
                           ),
                         );
@@ -162,11 +170,6 @@ class _mainPageState extends State<mainPage>
   }
 
   transfer() {
-    if (_drawerKey.currentState?.isDrawerOpen == true) {
-      print('the drawer is open');
-    }
-    print(_drawerKey.currentState?.isDrawerOpen);
-
     switch (widget.selected_index) {
       case 0:
         return HomePage(multi);
