@@ -19,7 +19,7 @@ class _mainPageState extends State<mainPage>
     super.initState();
     controller = new AnimationController(
       vsync: this,
-      duration: Duration(seconds: 9),
+      duration: Duration(seconds: 1),
     );
     animation = Tween<double>(begin: 3.14 / 2, end: 0.0).animate(controller);
   }
